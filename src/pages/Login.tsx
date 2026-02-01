@@ -40,8 +40,8 @@ export default function Login() {
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "adminadmine@stayvida.com",
-      password: "Admin1234",
+      email: "",
+      password: "",
     },
   });
 
