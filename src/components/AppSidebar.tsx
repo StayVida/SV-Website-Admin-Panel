@@ -1,8 +1,9 @@
-import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck } from "lucide-react";
+import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,6 +13,7 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "../hooks/use-auth";
 
 const menuItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -24,6 +26,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const { open } = useSidebar();
+  const { logout } = useAuth();
 
   return (
     <Sidebar collapsible="icon">
@@ -67,6 +70,19 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border p-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={logout}
+              className="text-sidebar-foreground hover:bg-sidebar-accent/50 w-full flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

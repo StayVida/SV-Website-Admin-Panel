@@ -1,90 +1,55 @@
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-const bookings = [
-  {
-    id: "BK-001",
-    guest: "John Doe",
-    hotel: "Grand Plaza Hotel",
-    checkIn: "2024-11-15",
-    checkOut: "2024-11-18",
-    status: "confirmed",
-    total: "$750",
-  },
-  {
-    id: "BK-002",
-    guest: "Sarah Smith",
-    hotel: "Ocean View Resort",
-    checkIn: "2024-11-20",
-    checkOut: "2024-11-25",
-    status: "pending",
-    total: "$1,200",
-  },
-  {
-    id: "BK-003",
-    guest: "Mike Johnson",
-    hotel: "Mountain Lodge",
-    checkIn: "2024-11-12",
-    checkOut: "2024-11-15",
-    status: "completed",
-    total: "$650",
-  },
-  {
-    id: "BK-004",
-    guest: "Emily Davis",
-    hotel: "City Center Inn",
-    checkIn: "2024-11-18",
-    checkOut: "2024-11-22",
-    status: "confirmed",
-    total: "$890",
-  },
-  {
-    id: "BK-005",
-    guest: "Robert Wilson",
-    hotel: "Lakeside Retreat",
-    checkIn: "2024-11-25",
-    checkOut: "2024-11-30",
-    status: "confirmed",
-    total: "$1,450",
-  },
-];
-
-const getStatusBadge = (status: string) => {
-  const variants = {
-    confirmed: "default",
-    pending: "secondary",
-    completed: "outline",
-    cancelled: "destructive",
-  } as const;
-
-  return (
-    <Badge variant={variants[status as keyof typeof variants] || "default"}>
-      {status}
-    </Badge>
-  );
-};
+import { Loader2 } from "lucide-react";
+import { fetchAllBookings } from "@/api/bookings";
+import { useAuth } from "@/hooks/use-auth";
+import { BookingsFilters } from "@/components/bookings/BookingsFilters";
+import { BookingsTable } from "@/components/bookings/BookingsTable";
+import { BookingDetailsDialog } from "@/components/bookings/BookingDetailsDialog";
 
 export default function Bookings() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const { logout } = useAuth();
 
-  const filteredBookings = bookings.filter(
-    (booking) =>
-      booking.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.guest.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.hotel.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { data: bookings = [], isLoading, error } = useQuery({
+    queryKey: ["bookings"],
+    queryFn: fetchAllBookings,
+  });
+
+  useEffect(() => {
+    if (error && (error as Error).message === "Unauthorized") {
+      logout();
+    }
+  }, [error, logout]);
+
+  const handleViewDetails = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    setIsDetailsOpen(true);
+  };
+
+  const filteredBookings = bookings.filter((booking) => {
+    const matchesSearch = 
+      booking.booking_ID.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      booking.hotel_ID.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || booking.booking_Status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  if (error && (error as Error).message !== "Unauthorized") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[400px] space-y-4">
+        <p className="text-destructive font-medium">Error loading bookings</p>
+        <p className="text-muted-foreground">{(error as Error).message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -93,44 +58,32 @@ export default function Bookings() {
         <p className="text-muted-foreground">Manage all hotel bookings and reservations</p>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search bookings..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+      <BookingsFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+      />
 
       <Card className="overflow-x-auto">
-        <Table className="min-w-[640px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Booking ID</TableHead>
-              <TableHead>Guest Name</TableHead>
-              <TableHead>Hotel</TableHead>
-              <TableHead>Check-in</TableHead>
-              <TableHead>Check-out</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredBookings.map((booking) => (
-              <TableRow key={booking.id}>
-                <TableCell className="font-medium">{booking.id}</TableCell>
-                <TableCell>{booking.guest}</TableCell>
-                <TableCell>{booking.hotel}</TableCell>
-                <TableCell>{booking.checkIn}</TableCell>
-                <TableCell>{booking.checkOut}</TableCell>
-                <TableCell>{getStatusBadge(booking.status)}</TableCell>
-                <TableCell className="text-right">{booking.total}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {isLoading ? (
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <BookingsTable
+            bookings={filteredBookings}
+            onViewDetails={handleViewDetails}
+          />
+        )}
       </Card>
+
+      <BookingDetailsDialog
+        bookingId={selectedBookingId}
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        onUnauthorized={logout}
+      />
     </div>
   );
 }

@@ -1,108 +1,106 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { MapPin, Star, Plus, Search } from "lucide-react";
-
-const hotels = [
-  {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    location: "New York, USA",
-    rating: 4.8,
-    rooms: 150,
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=500&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Ocean View Resort",
-    location: "Miami, USA",
-    rating: 4.9,
-    rooms: 200,
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Mountain Lodge",
-    location: "Aspen, USA",
-    rating: 4.7,
-    rooms: 80,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500&h=300&fit=crop",
-  },
-  {
-    id: 4,
-    name: "City Center Inn",
-    location: "Chicago, USA",
-    rating: 4.6,
-    rooms: 120,
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500&h=300&fit=crop",
-  },
-];
+import { Plus, Loader2, Hotel as HotelIcon, Search } from "lucide-react";
+import { fetchAllHotels } from "@/api/hotels";
+import { useAuth } from "@/hooks/use-auth";
+import { HotelCard } from "@/components/hotels/HotelCard";
+import { HotelFilters } from "@/components/hotels/HotelFilters";
 
 export default function Hotels() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const { logout } = useAuth();
 
-  const filteredHotels = hotels.filter(
-    (hotel) =>
+  const { data: hotels = [], isLoading, error } = useQuery({
+    queryKey: ["hotels"],
+    queryFn: fetchAllHotels,
+  });
+
+  useEffect(() => {
+    if (error && (error as Error).message === "Unauthorized") {
+      logout();
+    }
+  }, [error, logout]);
+
+  const filteredHotels = hotels.filter((hotel) => {
+    const matchesSearch = 
       hotel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hotel.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      hotel.destination.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || hotel.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  if (error && (error as Error).message !== "Unauthorized") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[500px] space-y-4">
+        <div className="bg-destructive/10 p-4 rounded-full">
+          <HotelIcon className="h-10 w-10 text-destructive" />
+        </div>
+        <div className="text-center">
+          <p className="text-xl font-bold text-destructive">Error loading hotels</p>
+          <p className="text-muted-foreground">{(error as Error).message}</p>
+        </div>
+        <Button onClick={() => window.location.reload()} variant="outline">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Hotels</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-primary">Hotels</h2>
           <p className="text-muted-foreground">Manage your hotel properties and listings</p>
         </div>
-        <Button>
+        {/* <Button className="h-11 px-6 shadow-md hover:shadow-lg transition-all active:scale-95">
           <Plus className="mr-2 h-4 w-4" />
           Add Hotel
-        </Button>
+        </Button> */}
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search hotels..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9"
-        />
-      </div>
+      <HotelFilters 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+      />
 
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredHotels.map((hotel) => (
-          <Card key={hotel.id} className="overflow-hidden">
-            <div className="aspect-video w-full overflow-hidden">
-              <img
-                src={hotel.image}
-                alt={hotel.name}
-                className="h-full w-full object-cover transition-transform hover:scale-105"
-              />
-            </div>
-            <CardHeader>
-              <CardTitle>{hotel.name}</CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {hotel.location}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-primary text-primary" />
-                  <span className="font-semibold">{hotel.rating}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">{hotel.rooms} rooms</span>
-              </div>
-              <Button variant="outline" className="mt-4 w-full">
-                Manage
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center h-[300px] space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-muted-foreground animate-pulse font-medium">Gathering your properties...</p>
+        </div>
+      ) : filteredHotels.length > 0 ? (
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredHotels.map((hotel) => (
+            <HotelCard key={hotel.hotel_ID} hotel={hotel} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[300px] bg-muted/20 border-2 border-dashed rounded-xl border-muted-foreground/20 space-y-4">
+          <div className="bg-muted p-4 rounded-full">
+            <Search className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <div className="text-center">
+            <p className="text-xl font-bold">No hotels found</p>
+            <p className="text-muted-foreground">
+              {searchTerm 
+                ? `No results for "${searchTerm}"` 
+                : "You haven't added any hotels yet."}
+            </p>
+          </div>
+          {searchTerm && (
+            <Button variant="ghost" onClick={() => setSearchTerm("")}>
+              Clear Search
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
