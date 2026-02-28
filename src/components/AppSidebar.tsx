@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -21,6 +21,7 @@ const menuItems = [
   { title: "Pending Hotels", url: "/pending-hotels", icon: ClipboardCheck },
   { title: "Hotels", url: "/hotels", icon: Hotel },
   { title: "Users", url: "/users", icon: Users },
+  { title: "Withdraw Requests", url: "/withdraw-requests", icon: Wallet },
   // { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -43,7 +44,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Management</SidebarGroupLabel>
@@ -73,7 +74,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
+            <SidebarMenuButton
               onClick={logout}
               className="text-sidebar-foreground hover:bg-sidebar-accent/50 w-full flex items-center gap-2"
             >

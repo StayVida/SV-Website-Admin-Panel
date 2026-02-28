@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { DashboardLayout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
@@ -12,9 +12,28 @@ import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 import PendingHotels from "./pages/PendingHotels";
 import Login from "./pages/Login";
+import WithdrawRequests from "./pages/WithdrawRequests";
 import { AuthProvider, useAuth } from "./hooks/use-auth";
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof Error && error.message === "Unauthorized") {
+        localStorage.removeItem("user");
+        localStorage.removeItem("access_token");
+        window.location.href = "/login";
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      if (error instanceof Error && error.message === "Unauthorized") {
+        localStorage.removeItem("user");
+        localStorage.removeItem("access_token");
+        window.location.href = "/login";
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: 1,
@@ -25,7 +44,7 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = () => {
   const { isAuthenticated } = useAuth();
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -42,7 +61,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            
+
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<DashboardLayout />}>
                 <Route index element={<Dashboard />} />
@@ -51,6 +70,7 @@ const App = () => (
                 <Route path="hotels" element={<Hotels />} />
                 <Route path="hotels/:hotelId" element={<HotelDetails />} />
                 <Route path="users" element={<Users />} />
+                <Route path="withdraw-requests" element={<WithdrawRequests />} />
               </Route>
             </Route>
 

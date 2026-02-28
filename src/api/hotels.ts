@@ -207,9 +207,54 @@ export const fetchHotelRatings = async (hotelId: string): Promise<RatingsRespons
         },
     });
 
+    if (response.status === 401) {
+        throw new Error("Unauthorized");
+    }
+
     if (!response.ok) {
         throw new Error("Failed to fetch hotel ratings");
     }
 
     return response.json();
+};
+
+export interface LedgerEntry {
+    sr: number;
+    hotel_id: string;
+    booking_id: string | null;
+    txn_date: string;
+    via: string;
+    transaction_id: string;
+    type: "CR" | "WITHDRAW";
+    amount: number;
+    balance_after: number;
+}
+
+export interface LedgerResponse {
+    count: number;
+    data: LedgerEntry[];
+}
+
+export const fetchHotelLedger = async (hotelId: string): Promise<LedgerEntry[]> => {
+    const token = localStorage.getItem("access_token");
+
+    const response = await fetch(`${API_BASE_URL}/api/admin/hotels/${hotelId}/ledger`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": API_key,
+            ...(token && { Authorization: `Bearer ${token}` }),
+        },
+    });
+
+    if (response.status === 401) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch hotel ledger");
+    }
+
+    const data: LedgerResponse = await response.json();
+    return data.data;
 };

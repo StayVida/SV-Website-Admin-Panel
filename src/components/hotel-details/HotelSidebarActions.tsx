@@ -139,7 +139,7 @@ export function HotelSidebarActions({ hotel }: HotelSidebarActionsProps) {
 
           <Separator />
 
-          {hotel.status !== "Verified" ? (
+          {hotel.status !== "Verified" && (
             <div className="grid grid-cols-2 gap-3">
               <Button 
                 variant="destructive" 
@@ -156,16 +156,7 @@ export function HotelSidebarActions({ hotel }: HotelSidebarActionsProps) {
                 <Check className="mr-2 h-4 w-4" /> Verify
               </Button>
             </div>
-          ) : (
-            <div className="grid gap-3">
-              <Button className="w-full h-11 shadow-md shadow-primary/20">
-                Update Listing
-              </Button>
-              <Button variant="outline" className="w-full">
-                Contact Property
-              </Button>
-            </div>
-          )}
+          ) }
         </CardContent>
       </Card>
 
