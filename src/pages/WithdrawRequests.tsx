@@ -134,7 +134,32 @@ export default function WithdrawRequests() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredRequests.length > 0 ? (
+                            {requests.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="h-72 text-center">
+                                        <div className="flex flex-col items-center justify-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                            <div className="bg-primary/5 p-6 rounded-full border border-primary/10 shadow-sm">
+                                                <Wallet className="h-12 w-12 text-primary/60" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <h3 className="font-semibold text-xl text-foreground">No withdrawal requests yet</h3>
+                                                <p className="text-muted-foreground text-sm max-w-[280px] mx-auto leading-relaxed">
+                                                    When hotel owners request a withdrawal, they will appear here for your review and approval.
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="mt-2 text-primary border-primary/20 hover:bg-primary/5 gap-2"
+                                                onClick={() => refetch()}
+                                            >
+                                                <RefreshCcw className="h-4 w-4" />
+                                                Check for updates
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : filteredRequests.length > 0 ? (
                                 filteredRequests.map((request) => (
                                     <TableRow key={request.sr} className="hover:bg-muted/30 transition-colors">
                                         <TableCell className="font-medium">#{request.sr}</TableCell>

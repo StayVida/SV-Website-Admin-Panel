@@ -50,7 +50,7 @@ export const fetchWithdrawRequests = async (): Promise<WithdrawRequest[]> => {
     }
 
     const data: WithdrawRequestsResponse = await response.json();
-    return data.data;
+    return data.data || [];
 };
 
 export const fetchWithdrawRequestById = async (srId: number): Promise<WithdrawRequestDetail | null> => {

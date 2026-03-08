@@ -14,6 +14,7 @@ import PendingHotels from "./pages/PendingHotels";
 import Login from "./pages/Login";
 import WithdrawRequests from "./pages/WithdrawRequests";
 import SystemAttributes from "./pages/SystemAttributes";
+import Contacts from "./pages/Contacts";
 import { AuthProvider, useAuth } from "./hooks/use-auth";
 
 const queryClient = new QueryClient({
@@ -73,6 +74,7 @@ const App = () => (
                 <Route path="users" element={<Users />} />
                 <Route path="attributes" element={<SystemAttributes />} />
                 <Route path="withdraw-requests" element={<WithdrawRequests />} />
+                <Route path="contacts" element={<Contacts />} />
               </Route>
             </Route>
 

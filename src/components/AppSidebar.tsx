@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet } from "lucide-react";
+import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet, MessageSquare } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -23,6 +23,7 @@ const menuItems = [
   { title: "Users", url: "/users", icon: Users },
   { title: "Attributes", url: "/attributes", icon: ClipboardCheck },
   { title: "Withdraw Requests", url: "/withdraw-requests", icon: Wallet },
+  { title: "Contacts", url: "/contacts", icon: MessageSquare },
   // { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -69,8 +70,8 @@ export function AppSidebar() {
                             <div className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 bg-white/80 rounded-r-md shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                           )}
                           <div className={`flex items-center justify-center rounded-md p-1.5 transition-all duration-300 ${isActive
-                              ? "bg-primary-foreground/20 text-primary-foreground shadow-sm"
-                              : "bg-sidebar-accent text-sidebar-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                            ? "bg-primary-foreground/20 text-primary-foreground shadow-sm"
+                            : "bg-sidebar-accent text-sidebar-foreground group-hover:bg-primary/10 group-hover:text-primary"
                             }`}>
                             <item.icon className={`h-4 w-4 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110 group-hover:rotate-3"}`} />
                           </div>

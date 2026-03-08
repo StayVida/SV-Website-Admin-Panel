@@ -67,6 +67,42 @@ const postWithAuth = async (endpoint: string, body: any) => {
     return response.json();
 };
 
+const putWithAuth = async (endpoint: string, body: any) => {
+    const token = localStorage.getItem("access_token");
+
+    const payload = typeof body === 'string' ? body : JSON.stringify(body);
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "x-api-key": API_key,
+            ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: payload,
+    });
+
+    if (response.status === 401) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!response.ok) {
+        throw new Error(`Failed to put to ${endpoint}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        return response.json();
+    }
+    return response.text();
+};
+
+export interface Charge {
+    charges_ID: number;
+    type: string;
+    value: number;
+}
+
 export const fetchAmenities = (): Promise<Amenity[]> => {
     return fetchWithAuth("/api/admin/amenities");
 };
@@ -79,6 +115,10 @@ export const fetchTags = (): Promise<Tag[]> => {
     return fetchWithAuth("/api/admin/tags");
 };
 
+export const fetchCharges = (): Promise<Charge[]> => {
+    return fetchWithAuth("/api/admin/charges");
+};
+
 export const createAmenity = (data: string[]) => {
     return postWithAuth("/api/admin/amenity", data);
 };
@@ -89,4 +129,8 @@ export const createFeature = (data: string[]) => {
 
 export const createTag = (data: string[]) => {
     return postWithAuth("/api/admin/tags", data);
+};
+
+export const updateCharges = (data: { type: string, value: number }[]) => {
+    return putWithAuth("/api/admin/update-charges", data);
 };
