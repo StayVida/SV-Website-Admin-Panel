@@ -20,13 +20,17 @@ export interface WithdrawRequestDetail extends WithdrawRequest {
 }
 
 export interface WithdrawRequestsResponse {
-    count: number;
-    data: WithdrawRequest[];
+    status?: number;
+    message?: string;
+    count?: number;
+    data: WithdrawRequest[] | { data: WithdrawRequest[] };
 }
 
 export interface WithdrawRequestDetailResponse {
-    count: number;
-    data: WithdrawRequestDetail[];
+    status?: number;
+    message?: string;
+    count?: number;
+    data: WithdrawRequestDetail[] | { data: WithdrawRequestDetail[] };
 }
 
 export const fetchWithdrawRequests = async (): Promise<WithdrawRequest[]> => {
@@ -50,7 +54,20 @@ export const fetchWithdrawRequests = async (): Promise<WithdrawRequest[]> => {
     }
 
     const data: WithdrawRequestsResponse = await response.json();
-    return data.data || [];
+    
+    // Handle different response structures
+    if (Array.isArray(data.data)) {
+        return data.data;
+    } else if (data.data && typeof data.data === 'object' && 'data' in data.data && Array.isArray(data.data.data)) {
+        return data.data.data;
+    }
+    
+    // If data is directly an array (not wrapped in WithdrawRequestsResponse object)
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    return [];
 };
 
 export const fetchWithdrawRequestById = async (srId: number): Promise<WithdrawRequestDetail | null> => {
@@ -74,7 +91,18 @@ export const fetchWithdrawRequestById = async (srId: number): Promise<WithdrawRe
     }
 
     const data: WithdrawRequestDetailResponse = await response.json();
-    return data.data?.[0] || null;
+    
+    // Handle different response structures
+    let detailsArray: WithdrawRequestDetail[] = [];
+    if (Array.isArray(data.data)) {
+        detailsArray = data.data;
+    } else if (data.data && typeof data.data === 'object' && 'data' in data.data && Array.isArray(data.data.data)) {
+        detailsArray = data.data.data;
+    } else if (Array.isArray(data)) {
+        detailsArray = data;
+    }
+
+    return detailsArray[0] || null;
 };
 
 export interface WithdrawRequestUpdateBody {
