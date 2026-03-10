@@ -167,8 +167,8 @@ export const fetchPendingHotels = async (): Promise<Hotel[]> => {
         throw new Error("Failed to fetch pending hotels");
     }
 
-    const data: HotelsResponse = await response.json();
-    return data && data.data ? data.data : [];
+    const data: any = await response.json();
+    return Array.isArray(data) ? data : (data && data.data ? data.data : []);
 };
 
 export const fetchHotelRooms = async (hotelId: string): Promise<Room[]> => {
