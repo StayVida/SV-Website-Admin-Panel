@@ -95,7 +95,7 @@ export const fetchAllHotels = async (): Promise<Hotel[]> => {
     }
 
     const data: HotelsResponse = await response.json();
-    return data.data;
+    return data && data.data ? data.data : [];
 };
 
 export const fetchHotelDetails = async (hotelId: string): Promise<HotelDetails> => {
@@ -120,7 +120,7 @@ export const fetchHotelDetails = async (hotelId: string): Promise<HotelDetails> 
 
     const data: HotelDetailsResponse = await response.json();
     // The API returns an array, we need the first element
-    return data.data[0];
+    return data && data.data && data.data.length > 0 ? data.data[0] : ({} as HotelDetails);
 };
 export const updateHotelStatus = async (hotelId: string, status: string, remark: string): Promise<any> => {
     const token = localStorage.getItem("access_token");
@@ -168,7 +168,7 @@ export const fetchPendingHotels = async (): Promise<Hotel[]> => {
     }
 
     const data: HotelsResponse = await response.json();
-    return data.data;
+    return data && data.data ? data.data : [];
 };
 
 export const fetchHotelRooms = async (hotelId: string): Promise<Room[]> => {
@@ -192,7 +192,7 @@ export const fetchHotelRooms = async (hotelId: string): Promise<Room[]> => {
     }
 
     const data: RoomsResponse = await response.json();
-    return data.data;
+    return data && data.data ? data.data : [];
 };
 
 export const fetchHotelRatings = async (hotelId: string): Promise<RatingsResponse> => {
@@ -256,5 +256,5 @@ export const fetchHotelLedger = async (hotelId: string): Promise<LedgerEntry[]> 
     }
 
     const data: LedgerResponse = await response.json();
-    return data.data;
+    return data && data.data ? data.data : [];
 };
