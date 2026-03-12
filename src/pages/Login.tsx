@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { loginUser } from "@/api/auth";
 import { useAuth } from "@/hooks/use-auth";
+import logo from "@/assets/zrnpmtooi6sdhorey8qh.webp";
 import { Loader2, Lock, Mail } from "lucide-react";
 
 const loginSchema = z.object({
@@ -71,10 +72,10 @@ export default function Login() {
       
       <Card className="w-full max-w-md backdrop-blur-sm bg-white/80 border-white/20 shadow-2xl animate-in fade-in zoom-in duration-500">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-4">
-            <Lock className="w-6 h-6 text-primary" />
+          <div className="mx-auto w-24 h-24 mb-6 overflow-hidden rounded-2xl shadow-xl ring-1 ring-primary/10 bg-white p-2">
+            <img src={logo} alt="Stayvida Logo" className="w-full h-full object-contain" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight">StayVida Admin</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight text-primary">StayVida Admin</CardTitle>
           <CardDescription>
             Enter your credentials to access the admin panel
           </CardDescription>

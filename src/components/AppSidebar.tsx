@@ -1,5 +1,6 @@
 import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet, MessageSquare } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import logo from "@/assets/zrnpmtooi6sdhorey8qh.webp";
 import {
   Sidebar,
   SidebarContent,
@@ -35,8 +36,8 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border/60 px-4 py-6">
         <div className="flex items-center gap-3 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 ring-1 ring-primary/10 transition-all duration-300 group-hover:scale-105">
-            <Hotel className="h-5 w-5" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg shadow-primary/20 ring-1 ring-primary/10 transition-all duration-300 group-hover:scale-105">
+            <img src={logo} alt="Stayvida Logo" className="h-full w-full object-contain" />
           </div>
           {open && (
             <div className="flex flex-col">
