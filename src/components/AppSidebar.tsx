@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Calendar, Hotel, Users, ClipboardCheck, LogOut, Wallet, MessageSquare, Shield } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import logo from "@/assets/zrnpmtooi6sdhorey8qh.webp";
 import {
@@ -22,6 +22,7 @@ const menuItems = [
   { title: "Pending Hotels", url: "/pending-hotels", icon: ClipboardCheck },
   { title: "Hotels", url: "/hotels", icon: Hotel },
   { title: "Users", url: "/users", icon: Users },
+  { title: "Executives", url: "/executives", icon: Shield },
   { title: "Attributes", url: "/attributes", icon: ClipboardCheck },
   { title: "Withdraw Requests", url: "/withdraw-requests", icon: Wallet },
   { title: "Contacts", url: "/contacts", icon: MessageSquare },
